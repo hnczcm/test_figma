@@ -1,667 +1,880 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZipMaster - 专业的文件压缩管理工具</title>
-  <style>
-    :root {
-      /* 主色调 */
-      --primary: #2196F3;
-      --primary-dark: #1976D2;
-      --primary-light: #64B5F6;
-      
-      /* 强调色 */
-      --accent: #FF4081;
-      --success: #4CAF50;
-      --warning: #FFC107;
-      --error: #F44336;
-      
-      /* 背景色 */
-      --bg-primary: #FFFFFF;
-      --bg-secondary: #F5F5F5;
-      --bg-dark: #333333;
-      
-      /* 文本颜色 */
-      --text-primary: #333333;
-      --text-secondary: #666666;
-      --text-light: #999999;
-      
-      /* 边框与阴影 */
-      --border: #E0E0E0;
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-      --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
-      --shadow-lg: 0 8px 16px rgba(0,0,0,0.1);
-      
-      /* 间距 */
-      --space-xs: 4px;
-      --space-sm: 8px;
-      --space-md: 16px;
-      --space-lg: 24px;
-      --space-xl: 32px;
-      
-      /* 圆角 */
-      --radius-sm: 4px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    }
-    
-    body {
-      background-color: var(--bg-secondary);
-      color: var(--text-primary);
-      line-height: 1.5;
-      padding: var(--space-md);
-    }
-    
-    .screen-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-xl);
-      justify-content: center;
-    }
-    
-    .screen {
-      width: 1000px;
-      height: 700px;
-      background: var(--bg-primary);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-lg);
-      display: flex;
-    }
-    
-    /* 侧边栏样式 */
-    .sidebar {
-      width: 240px;
-      background: var(--bg-dark);
-      color: white;
-      padding: var(--space-lg);
-    }
-    
-    .logo {
-      display: flex;
-      align-items: center;
-      margin-bottom: var(--space-xl);
-    }
-    
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      margin-right: var(--space-sm);
-      color: var(--primary);
-    }
-    
-    .logo-text {
-      font-size: 20px;
-      font-weight: 600;
-      color: white;
-    }
-    
-    .nav-menu {
-      list-style: none;
-    }
-    
-    .nav-item {
-      margin-bottom: var(--space-xs);
-    }
-    
-    .nav-link {
-      display: flex;
-      align-items: center;
-      padding: var(--space-md);
-      color: rgba(255,255,255,0.7);
-      text-decoration: none;
-      border-radius: var(--radius-md);
-      transition: all 0.2s ease;
-    }
-    
-    .nav-link:hover {
-      background: rgba(255,255,255,0.1);
-      color: white;
-    }
-    
-    .nav-link.active {
-      background: var(--primary);
-      color: white;
-    }
-    
-    .nav-icon {
-      width: 24px;
-      height: 24px;
-      margin-right: var(--space-md);
-    }
-    
-    /* 主内容区域样式 */
-    .main-content {
-      flex: 1;
-      padding: var(--space-xl);
-      overflow-y: auto;
-    }
-    
-    .page-title {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: var(--space-xl);
-    }
-    
-    /* 快速操作区样式 */
-    .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--space-md);
-      margin-bottom: var(--space-xl);
-    }
-    
-    .action-card {
-      background: white;
-      padding: var(--space-lg);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 2px solid transparent;
-    }
-    
-    .action-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--primary);
-    }
-    
-    .action-icon {
-      font-size: 32px;
-      color: var(--primary);
-      margin-bottom: var(--space-md);
-    }
-    
-    .action-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: var(--space-xs);
-    }
-    
-    .action-desc {
-      color: var(--text-secondary);
-      font-size: 14px;
-    }
-    
-    /* 文件列表样式 */
-    .file-list {
-      background: white;
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-    }
-    
-    .file-list-header {
-      padding: var(--space-md);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .file-item {
-      display: flex;
-      align-items: center;
-      padding: var(--space-md);
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .file-icon {
-      width: 40px;
-      height: 40px;
-      margin-right: var(--space-md);
-      color: var(--primary);
-    }
-    
-    .file-info {
-      flex: 1;
-    }
-    
-    .file-name {
-      font-weight: 500;
-      margin-bottom: var(--space-xs);
-    }
-    
-    .file-meta {
-      color: var(--text-secondary);
-      font-size: 12px;
-    }
-    
-    /* 按钮样式 */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      padding: var(--space-sm) var(--space-md);
-      border-radius: var(--radius-md);
-      border: none;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-    
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      background: var(--primary-dark);
-    }
-    
-    .btn-secondary {
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-    }
-    
-    .btn-secondary:hover {
-      background: var(--border);
-    }
-    
-    /* 上传区域样式 */
-    .upload-area {
-      border: 2px dashed var(--border);
-      border-radius: var(--radius-lg);
-      padding: var(--space-xl);
-      text-align: center;
-      margin-bottom: var(--space-xl);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    .upload-area:hover {
-      border-color: var(--primary);
-      background: var(--bg-secondary);
-    }
-    
-    /* 进度条样式 */
-    .progress-bar {
-      height: 6px;
-      background: var(--bg-secondary);
-      border-radius: 3px;
-      overflow: hidden;
-      margin: var(--space-sm) 0;
-    }
-    
-    .progress-fill {
-      height: 100%;
-      background: var(--primary);
-      width: 60%;
-      transition: width 0.3s ease;
-    }
-    
-    /* 设置面板样式 */
-    .settings-section {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: var(--space-lg);
-      margin-bottom: var(--space-lg);
-    }
-    
-    .setting-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: var(--space-md) 0;
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .setting-label {
-      display: flex;
-      align-items: center;
-    }
-    
-    .setting-icon {
-      margin-right: var(--space-md);
-      color: var(--primary);
-    }
-    
-    /* 工具箱样式 */
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--space-lg);
-    }
-    
-    .tool-card {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: var(--space-lg);
-      text-align: center;
-      box-shadow: var(--shadow-md);
-      transition: all 0.2s ease;
-    }
-    
-    .tool-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-    
-    .tool-icon {
-      font-size: 36px;
-      color: var(--primary);
-      margin-bottom: var(--space-md);
-    }
-  </style>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>畅享星空AI小助手 - 智能AI办公插件</title>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-dark: #3a56d4;
+            --primary-light: #6282fa;
+            --accent-color: #ff6b6b;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --bg-light: #f8f9fa;
+            --bg-white: #ffffff;
+            --bg-gradient: linear-gradient(135deg, #4361ee, #805dfa);
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 16px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+            --container-width: 1200px;
+            --header-height: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.6;
+            background-color: var(--bg-light);
+        }
+        
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: color 0.3s ease;
+        }
+        
+        a:hover {
+            color: var(--primary-dark);
+        }
+        
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-accent {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-accent:hover {
+            background-color: #ff5252;
+        }
+        
+        /* 头部导航 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background-color: var(--bg-white);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-img {
+            height: 36px;
+            margin-right: var(--spacing-sm);
+        }
+        
+        .logo-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .nav {
+            display: flex;
+        }
+        
+        .nav-item {
+            margin-left: var(--spacing-xl);
+            font-weight: 500;
+        }
+        
+        .nav-item a {
+            color: var(--text-primary);
+        }
+        
+        .nav-item a:hover {
+            color: var(--primary-color);
+        }
+        
+        .nav-item.active a {
+            color: var(--primary-color);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .header-btn {
+            margin-left: var(--spacing-md);
+        }
+        
+        /* 英雄区域 */
+        .hero {
+            padding-top: calc(var(--header-height) + var(--spacing-xxl));
+            padding-bottom: var(--spacing-xxl);
+            background: var(--bg-gradient);
+            color: white;
+            text-align: center;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-xxl) 0;
+        }
+        
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 20px;
+            margin-bottom: var(--spacing-xl);
+            opacity: 0.9;
+        }
+        
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .hero-image {
+            max-width: 100%;
+            margin-top: var(--spacing-xl);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        /* 特性部分 */
+        .features {
+            padding: var(--spacing-xxl) 0;
+            background-color: var(--bg-white);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+        
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .feature-card {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .feature-icon {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .feature-description {
+            color: var(--text-secondary);
+        }
+        
+        /* 产品展示 */
+        .products {
+            padding: var(--spacing-xxl) 0;
+            background-color: var(--bg-light);
+        }
+        
+        .product-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: var(--spacing-xl);
+            border-bottom: 1px solid #eee;
+        }
+        
+        .product-tab {
+            padding: var(--spacing-md) var(--spacing-xl);
+            cursor: pointer;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .product-tab.active {
+            color: var(--primary-color);
+        }
+        
+        .product-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .product-content {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xxl);
+        }
+        
+        .product-image {
+            flex: 1;
+        }
+        
+        .product-image img {
+            max-width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .product-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .product-features {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .product-feature {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .feature-check {
+            color: var(--primary-color);
+            margin-right: var(--spacing-sm);
+            font-size: 20px;
+        }
+        
+        /* 使用场景 */
+        .use-cases {
+            padding: var(--spacing-xxl) 0;
+            background-color: var(--bg-white);
+        }
+        
+        .use-cases-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .use-case-card {
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .use-case-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+        }
+        
+        .use-case-icon {
+            margin-right: var(--spacing-sm);
+            color: var(--primary-color);
+        }
+        
+        .use-case-description {
+            color: var(--text-secondary);
+        }
+        
+        /* 价格部分 */
+        .pricing {
+            padding: var(--spacing-xxl) 0;
+            background-color: var(--bg-light);
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .pricing-card {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .pricing-card.popular {
+            border: 2px solid var(--primary-color);
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.popular:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: 12px;
+            right: -30px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 30px;
+            transform: rotate(45deg);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .pricing-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .pricing-price {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+        
+        .pricing-period {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .pricing-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .pricing-features {
+            text-align: left;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .pricing-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-secondary);
+        }
+        
+        .pricing-check {
+            color: var(--primary-color);
+            margin-right: var(--spacing-sm);
+        }
+        
+        /* 客户评价 */
+        .testimonials {
+            padding: var(--spacing-xxl) 0;
+            background-color: var(--bg-white);
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .testimonial-card {
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .testimonial-content {
+            margin-bottom: var(--spacing-md);
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: var(--spacing-md);
+            object-fit: cover;
+        }
+        
+        .author-info {
+            flex: 1;
+        }
+        
+        .author-name {
+            font-weight: 600;
+        }
+        
+        .author-title {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        /* CTA部分 */
+        .cta {
+            padding: var(--spacing-xxl) 0;
+            background: var(--bg-gradient);
+            color: white;
+            text-align: center;
+        }
+        
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .cta-description {
+            margin-bottom: var(--spacing-xl);
+            opacity: 0.9;
+        }
+        
+        /* 页脚 */
+        .footer {
+            padding: var(--spacing-xxl) 0 var(--spacing-lg);
+            background-color: #2d3748;
+            color: white;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .footer-logo-img {
+            height: 30px;
+            margin-right: var(--spacing-sm);
+        }
+        
+        .footer-logo-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .footer-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        
+        .social-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icon:hover {
+            background-color: var(--primary-color);
+        }
+        
+        .footer-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: white;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-link {
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .footer-link a {
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+        }
+        
+        .footer-link a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: var(--spacing-xl) var(--spacing-xxl);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .product-content {
+                flex-direction: column;
+            }
+            
+            .use-cases-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-card.popular {
+                transform: none;
+            }
+            
+            .pricing-card.popular:hover {
+                transform: translateY(-5px);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-title {
+                font-size: 36px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="screen-container">
-    <!-- 主页面 -->
-    <div class="screen">
-      <aside class="sidebar">
-        <div class="logo">
-          <span class="material-icons logo-icon">folder_zip</span>
-          <span class="logo-text">ZipMaster</span>
+    <!-- 头部导航 -->
+    <header class="header">
+        <div class="container header-container">
+            <div class="logo">
+                <img src="https://via.placeholder.com/36x36" alt="畅享星空AI小助手" class="logo-img">
+                <div class="logo-text">畅享星空AI小助手</div>
+            </div>
+            
+            <nav class="nav">
+                <div class="nav-item active"><a href="#home">首页</a></div>
+                <div class="nav-item"><a href="#features">功能</a></div>
+                <div class="nav-item"><a href="#products">产品</a></div>
+                <div class="nav-item"><a href="#pricing">价格</a></div>
+                <div class="nav-item"><a href="#about">关于我们</a></div>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="#download" class="btn btn-outline header-btn">免费试用</a>
+                <a href="#contact" class="btn header-btn">立即购买</a>
+            </div>
         </div>
-        
-        <nav class="nav-menu">
-          <li class="nav-item">
-            <a href="#" class="nav-link active">
-              <span class="material-icons nav-icon">home</span>
-              首页
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <span class="material-icons nav-icon">folder_zip</span>
-              压缩文件
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <span class="material-icons nav-icon">folder</span>
-              解压文件
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <span class="material-icons nav-icon">build</span>
-              工具箱
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <span class="material-icons nav-icon">history</span>
-              最近文件
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <span class="material-icons nav-icon">settings</span>
-              设置
-            </a>
-          </li>
-        </nav>
-      </aside>
-
-      <main class="main-content">
-        <h1 class="page-title">欢迎使用 ZipMaster</h1>
-        
-        <div class="quick-actions">
-          <div class="action-card">
-            <span class="material-icons action-icon">folder_zip</span>
-            <h3 class="action-title">压缩文件</h3>
-            <p class="action-desc">将文件或文件夹压缩为ZIP、RAR等格式</p>
-          </div>
-          
-          <div class="action-card">
-            <span class="material-icons action-icon">folder</span>
-            <h3 class="action-title">解压文件</h3>
-            <p class="action-desc">解压ZIP、RAR、7Z等格式的压缩文件</p>
-          </div>
-          
-          <div class="action-card">
-            <span class="material-icons action-icon">security</span>
-            <h3 class="action-title">加密压缩</h3>
-            <p class="action-desc">创建带密码保护的加密压缩文件</p>
-          </div>
-          
-          <div class="action-card">
-            <span class="material-icons action-icon">build</span>
-            <h3 class="action-title">修复工具</h3>
-            <p class="action-desc">修复损坏的压缩文件</p>
-          </div>
+    </header>
+    
+    <!-- 英雄区域 -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">智能AI办公，提升工作效率</h1>
+                <p class="hero-subtitle">畅享星空AI小助手是一款智能AI办公工具软件，集成DeepSeek大模型，为Excel和Word提供强大的AI辅助功能，让日常工作变得更加轻松便捷。</p>
+                <div class="hero-actions">
+                    <a href="#download" class="btn btn-accent">免费下载</a>
+                    <a href="#learn-more" class="btn btn-outline">了解更多</a>
+                </div>
+            </div>
+            <img src="https://via.placeholder.com/1000x600" alt="畅享星空AI小助手界面展示" class="hero-image">
         </div>
-        
-        <div class="file-list">
-          <div class="file-list-header">
-            <h2>最近文件</h2>
-            <button class="btn btn-secondary">查看全部</button>
-          </div>
-          
-          <div class="file-item">
-            <span class="material-icons file-icon">folder_zip</span>
-            <div class="file-info">
-              <div class="file-name">项目文档.zip</div>
-              <div class="file-meta">
-                <span>2.5 MB</span> • 
-                <span>压缩率 75%</span> • 
-                <span>2分钟前</span>
-              </div>
+    </section>
+    
+    <!-- 特性部分 -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">强大的AI办公助手</h2>
+                <p class="section-subtitle">畅享星空AI小助手集成了多种智能功能，帮助您提高办公效率，解放双手</p>
             </div>
-            <button class="btn btn-secondary">
-              <span class="material-icons">more_vert</span>
-            </button>
-          </div>
-          
-          <div class="file-item">
-            <span class="material-icons file-icon">folder_zip</span>
-            <div class="file-info">
-              <div class="file-name">照片备份.rar</div>
-              <div class="progress-bar">
-                <div class="progress-fill"></div>
-              </div>
-              <div class="file-meta">
-                <span>1.8 GB</span> • 
-                <span>压缩中 60%</span> • 
-                <span>剩余 2 分钟</span>
-              </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-robot feature-icon"></i>
+                    <h3 class="feature-title">智能AI对话</h3>
+                    <p class="feature-description">与DeepSeek大模型进行自然语言对话，获取专业解答和建议，提升工作效率。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-table feature-icon"></i>
+                    <h3 class="feature-title">Excel智能助手</h3>
+                    <p class="feature-description">通过简单的指令，自动完成复杂的公式计算、函数选择，让数据处理更加高效。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-file-word feature-icon"></i>
+                    <h3 class="feature-title">Word智能助手</h3>
+                    <p class="feature-description">整理周报、撰写会议纪要、总结内容、文案润色，让文档处理更加轻松。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-bolt feature-icon"></i>
+                    <h3 class="feature-title">快速响应</h3>
+                    <p class="feature-description">基于先进的AI技术，提供快速响应，让您的工作流程不受打断。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-lock feature-icon"></i>
+                    <h3 class="feature-title">数据安全</h3>
+                    <p class="feature-description">严格的数据保护机制，确保您的办公数据安全可靠，不会泄露。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-sync feature-icon"></i>
+                    <h3 class="feature-title">持续更新</h3>
+                    <p class="feature-description">定期更新功能和模型，不断提升AI能力，为您带来更好的使用体验。</p>
+                </div>
             </div>
-            <button class="btn btn-secondary">
-              <span class="material-icons">pause</span>
-            </button>
-          </div>
         </div>
-      </main>
-    </div>
-
-    <!-- 压缩页面 -->
-    <div class="screen">
-      <aside class="sidebar">
-        <!-- 相同的侧边栏 -->
-      </aside>
-
-      <main class="main-content">
-        <h1 class="page-title">压缩文件</h1>
-        
-        <div class="upload-area">
-          <span class="material-icons" style="font-size: 48px; color: var(--primary); margin-bottom: var(--space-md);">cloud_upload</span>
-          <h3 style="margin-bottom: var(--space-sm);">拖放文件到这里</h3>
-          <p style="color: var(--text-secondary);">或点击选择文件</p>
+    </section>
+    
+    <!-- 产品展示 -->
+    <section class="products" id="products">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">产品功能展示</h2>
+                <p class="section-subtitle">畅享星空AI小助手为您提供全方位的办公辅助功能</p>
+            </div>
+            
+            <div class="product-tabs">
+                <div class="product-tab active">ExcelAI</div>
+                <div class="product-tab">WordAI</div>
+                <div class="product-tab">智能对话</div>
+            </div>
+            
+            <div class="product-content">
+                <div class="product-image">
+                    <img src="https://via.placeholder.com/500x400" alt="ExcelAI功能展示">
+                </div>
+                
+                <div class="product-info">
+                    <h3 class="product-title">ExcelAI - 智能表格助手</h3>
+                    <p class="product-description">ExcelAI是一款强大的Excel插件，通过自然语言指令，帮助您快速完成复杂的表格操作，提高数据处理效率。</p>
+                    
+                    <div class="product-features">
+                        <div class="product-feature">
+                            <i class="fas fa-check-circle feature-check"></i>
+                            <div>智能公式生成：只需描述需求，AI自动生成复杂公式</div>
+                        </div>
+                        <div class="product-feature">
+                            <i class="fas fa-check-circle feature-check"></i>
+                            <div>数据分析：快速分析数据趋势，生成洞察报告</div>
+                        </div>
+                        <div class="product-feature">
+                            <i class="fas fa-check-circle feature-check"></i>
+                            <div>图表推荐：根据数据特点，推荐最合适的图表类型</div>
+                        </div>
+                        <div class="product-feature">
+                            <i class="fas fa-check-circle feature-check"></i>
+                            <div>函数查询：通过自然语言查询Excel函数用法</div>
+                        </div>
+                        <div class="product-feature">
+                            <i class="fas fa-check-circle feature-check"></i>
+                            <div>数据清洗：自动识别并修复数据错误和异常值</div>
+                        </div>
+                    </div>
+                    
+                    <a href="#excel-demo" class="btn">查看演示</a>
+                </div>
+            </div>
         </div>
-        
-        <div class="settings-section">
-          <h3 style="margin-bottom: var(--space-lg);">压缩选项</h3>
-          
-          <div class="setting-item">
-            <div class="setting-label">
-              <span class="material-icons setting-icon">format_list_bulleted</span>
-              <div>
-                <div>压缩格式</div>
-                <div style="color: var(--text-secondary); font-size: 12px;">选择输出的压缩文件格式</div>
-              </div>
+    </section>
+    
+    <!-- 使用场景 -->
+    <section class="use-cases" id="use-cases">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">适用场景</h2>
+                <p class="section-subtitle">畅享星空AI小助手适用于多种办公场景，满足不同用户的需求</p>
             </div>
-            <select class="btn btn-secondary">
-              <option>ZIP 格式</option>
-              <option>RAR 格式</option>
-              <option>7Z 格式</option>
-            </select>
-          </div>
-          
-          <div class="setting-item">
-            <div class="setting-label">
-              <span class="material-icons setting-icon">speed</span>
-              <div>
-                <div>压缩等级</div>
-                <div style="color: var(--text-secondary); font-size: 12px;">选择压缩率和速度的平衡</div>
-              </div>
-            </div>
-            <select class="btn btn-secondary">
-              <option>标准压缩</option>
-              <option>极速压缩</option>
-              <option>最大压缩</option>
-            </select>
-          </div>
-          
-          <div class="setting-item">
-            <div class="setting-label">
-              <span class="material-icons setting-icon">lock</span>
-              <div>
-                <div>加密选项</div>
-                <div style="color: var(--text-secondary); font-size: 12px;">为压缩文件添加密码保护</div>
-              </div>
-            </div>
-            <input type="password" placeholder="输入密码" class="btn btn-secondary">
-          </div>
-        </div>
-        
-        <button class="btn btn-primary" style="width: 100%;">
-          <span class="material-icons" style="margin-right: var(--space-sm);">folder_zip</span>
-          开始压缩
-        </button>
-      </main>
-    </div>
-
-    <!-- 工具箱页面 -->
-    <div class="screen">
-      <aside class="sidebar">
-        <!-- 相同的侧边栏 -->
-      </aside>
-
-      <main class="main-content">
-        <h1 class="page-title">工具箱</h1>
-        
-        <div class="tools-grid">
-          <div class="tool-card">
-            <span class="material-icons tool-icon">build</span>
-            <h3 style="margin-bottom: var(--space-sm);">修复压缩文件</h3>
-            <p style="color: var(--text-secondary);">修复损坏的ZIP、RAR文件</p>
-          </div>
-          
-          <div class="tool-card">
-            <span class="material-icons tool-icon">content_cut</span>
-            <h3 style="margin-bottom: var(--space-sm);">分卷压缩</h3>
-            <p style="color: var(--text-secondary);">将大文件分割成多个小文件</p>
-          </div>
-          
-          <div class="tool-card">
-            <span class="material-icons tool-icon">security</span>
-            <h3 style="margin-bottom: var(--space-sm);">加密工具</h3>
-            <p style="color: var(--text-secondary);">为压缩文件添加密码保护</p>
-          </div>
-          
-          <div class="tool-card">
-            <span class="material-icons tool-icon">compare</span>
-            <h3 style="margin-bottom: var(--space-sm);">文件对比</h3>
-            <p style="color: var(--text-secondary);">比较两个压缩文件的差异</p>
-          </div>
-          
-          <div class="tool-card">
-            <span class="material-icons tool-icon">speed</span>
-            <h3 style="margin-bottom: var(--space-sm);">压缩测试</h3>
-            <p style="color: var(--text-secondary);">测试压缩文件的完整性</p>
-          </div>
-          
-          <div class="tool-card">
-            <span class="material-icons tool-icon">format_list_bulleted</span>
-            <h3 style="margin-bottom: var(--space-sm);">批量处理</h3>
-            <p style="color: var(--text-secondary);">批量压缩或解压文件</p>
-          </div>
-        </div>
-      </main>
-    </div>
-
-    <!-- 设置页面 -->
-    <div class="screen">
-      <aside class="sidebar">
-        <!-- 相同的侧边栏 -->
-      </aside>
-
-      <main class="main-content">
-        <h1 class="page-title">设置</h1>
-        
-        <div class="settings-section">
-          <h3 style="margin-bottom: var(--space-lg);">常规设置</h3>
-          
-          <div class="setting-item">
-            <div class="setting-label">
-              <span class="material-icons setting-icon">language</span>
-              <div>
-                <div>界面语言</div>
-                <div style="color: var(--text-secondary); font-size: 12px;">选择软件界面显示语言</div>
-              </div>
-            </div>
-            <select class="btn btn-secondary">
-              <option>简体中文</option>
-              <option>English</option>
-              <option>日本語</option>
-            </select>
-          </div>
-          
-          <div class="setting-item">
-            <div class="setting-label">
-              <span class="material-icons setting-icon">folder</span>
-              <div>
-                <div>默认输出目录</div>
-                <div style="color: var(--text-secondary); font-size: 12px;">设置压缩文件的默认保存位置</div>
-              </div>
-            </div>
-            <button class="btn btn-secondary">选择目录</button>
-          </div>
-        </div>
-        
-        <div class="settings-section">
-          <h3 style="margin-bottom: var(--space-lg);">压缩设置</h3>
-          
-          <div class="setting-item">
-            <div class="setting-label">
-              <span class="material-icons setting-icon">folder_zip</span>
-              <div>
-                <div>默认压缩格式</div>
-                <div style="color: var(--text-secondary); font-size: 12px;">新建压缩文件时使用的格式</div>
-              </div>
-            </div>
-            <select class="btn btn-secondary">
-              <option>ZIP 格式</option>
-              <option>RAR 格式</option>
-              <option>7Z 格式</option>
-            </select>
-          </div>
-          
-          <div class="setting-item">
-            <div class="setting-label">
-              <span class="material-icons setting-icon">speed</span>
-              <div>
-                <div>默认压缩等级</div>
-                <div style="color: var(--text-secondary); font-size: 12px;">压缩文件时使用的压缩等级</div>
-              </div>
-            </div>
-            <select class="btn btn-secondary">
-              <option>标准压缩</option>
-              <option>极速压缩</option>
-              <option>最大压缩</option>
-            </select>
-          </div>
-        </div>
-      </main>
-    </div>
-  </div>
-</body>
-</html>
+            
+            <div class="use-cases-grid">
+                <div class="use-case-card">
+                    <h3 class="use-case-title">
+                        <i class="fas fa-chart-line use-case-icon"></i>
+                        数据分析师
+                    </h3>
+                    <p class="use-case-description">快速处理大量数据，生成复杂公式，进行数据可视化，提高数据分析效率。</p>
+                </div>
+                
+                <div class="use-case-card">
+                    <h3 class="use-case-title">
+                        <i class="fas fa-briefcase use-case-icon"></i>
+                        企业管理者
+                    </h3>
+                    <p class="use-case-description">快速生成会议纪要、工作报告，整理团队周报，提高管理效率。</p>
+                </div>
+                
+                <div class="use-case-card">
+                    <h3 class="use-case-title">
+                        <i class="fas fa-user-graduate use-case-icon"></i>
+                        学生与教师
+                    </h3>
+                    <p class="use-case-description">辅助学术写作，整理研究资料，生成教学内容，提高学习和教学效率。</p>
+                </div>
+                
+                <div class="use-case-card">
+                    <h3 class="use-case-title">
+                        <i class
