@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZipMaster - 专业的文件压缩管理工具</title>
+  <style>
+    :root {
+      /* 主色调 */
+      --primary: #2196F3;
+      --primary-dark: #1976D2;
+      --primary-light: #64B5F6;
+      
+      /* 强调色 */
+      --accent: #FF4081;
+      --success: #4CAF50;
+      --warning: #FFC107;
+      --error: #F44336;
+      
+      /* 背景色 */
+      --bg-primary: #FFFFFF;
+      --bg-secondary: #F5F5F5;
+      --bg-dark: #333333;
+      
+      /* 文本颜色 */
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-light: #999999;
+      
+      /* 边框与阴影 */
+      --border: #E0E0E0;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+      --shadow-lg: 0 8px 16px rgba(0,0,0,0.1);
+      
+      /* 间距 */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      
+      /* 圆角 */
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      padding: var(--space-md);
+    }
+    
+    .screen-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xl);
+      justify-content: center;
+    }
+    
+    .screen {
+      width: 1000px;
+      height: 700px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+    }
+    
+    /* 侧边栏样式 */
+    .sidebar {
+      width: 240px;
+      background: var(--bg-dark);
+      color: white;
+      padding: var(--space-lg);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: var(--space-xl);
+    }
+    
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: var(--space-sm);
+      color: var(--primary);
+    }
+    
+    .logo-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .nav-menu {
+      list-style: none;
+    }
+    
+    .nav-item {
+      margin-bottom: var(--space-xs);
+    }
+    
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: var(--space-md);
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+    }
+    
+    .nav-link:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+    
+    .nav-link.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: var(--space-md);
+    }
+    
+    /* 主内容区域样式 */
+    .main-content {
+      flex: 1;
+      padding: var(--space-xl);
+      overflow-y: auto;
+    }
+    
+    .page-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: var(--space-xl);
+    }
+    
+    /* 快速操作区样式 */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .action-card {
+      background: white;
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+    }
+    
+    .action-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+    }
+    
+    .action-icon {
+      font-size: 32px;
+      color: var(--primary);
+      margin-bottom: var(--space-md);
+    }
+    
+    .action-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .action-desc {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    
+    /* 文件列表样式 */
+    .file-list {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .file-list-header {
+      padding: var(--space-md);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .file-item {
+      display: flex;
+      align-items: center;
+      padding: var(--space-md);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .file-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: var(--space-md);
+      color: var(--primary);
+    }
+    
+    .file-info {
+      flex: 1;
+    }
+    
+    .file-name {
+      font-weight: 500;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .file-meta {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+    
+    /* 按钮样式 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+    
+    /* 上传区域样式 */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      text-align: center;
+      margin-bottom: var(--space-xl);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .upload-area:hover {
+      border-color: var(--primary);
+      background: var(--bg-secondary);
+    }
+    
+    /* 进度条样式 */
+    .progress-bar {
+      height: 6px;
+      background: var(--bg-secondary);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: var(--space-sm) 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 60%;
+      transition: width 0.3s ease;
+    }
+    
+    /* 设置面板样式 */
+    .settings-section {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .setting-label {
+      display: flex;
+      align-items: center;
+    }
+    
+    .setting-icon {
+      margin-right: var(--space-md);
+      color: var(--primary);
+    }
+    
+    /* 工具箱样式 */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-lg);
+    }
+    
+    .tool-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s ease;
+    }
+    
+    .tool-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .tool-icon {
+      font-size: 36px;
+      color: var(--primary);
+      margin-bottom: var(--space-md);
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <div class="screen-container">
+    <!-- 主页面 -->
+    <div class="screen">
+      <aside class="sidebar">
+        <div class="logo">
+          <span class="material-icons logo-icon">folder_zip</span>
+          <span class="logo-text">ZipMaster</span>
+        </div>
+        
+        <nav class="nav-menu">
+          <li class="nav-item">
+            <a href="#" class="nav-link active">
+              <span class="material-icons nav-icon">home</span>
+              首页
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <span class="material-icons nav-icon">folder_zip</span>
+              压缩文件
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <span class="material-icons nav-icon">folder</span>
+              解压文件
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <span class="material-icons nav-icon">build</span>
+              工具箱
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <span class="material-icons nav-icon">history</span>
+              最近文件
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <span class="material-icons nav-icon">settings</span>
+              设置
+            </a>
+          </li>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <h1 class="page-title">欢迎使用 ZipMaster</h1>
+        
+        <div class="quick-actions">
+          <div class="action-card">
+            <span class="material-icons action-icon">folder_zip</span>
+            <h3 class="action-title">压缩文件</h3>
+            <p class="action-desc">将文件或文件夹压缩为ZIP、RAR等格式</p>
+          </div>
+          
+          <div class="action-card">
+            <span class="material-icons action-icon">folder</span>
+            <h3 class="action-title">解压文件</h3>
+            <p class="action-desc">解压ZIP、RAR、7Z等格式的压缩文件</p>
+          </div>
+          
+          <div class="action-card">
+            <span class="material-icons action-icon">security</span>
+            <h3 class="action-title">加密压缩</h3>
+            <p class="action-desc">创建带密码保护的加密压缩文件</p>
+          </div>
+          
+          <div class="action-card">
+            <span class="material-icons action-icon">build</span>
+            <h3 class="action-title">修复工具</h3>
+            <p class="action-desc">修复损坏的压缩文件</p>
+          </div>
+        </div>
+        
+        <div class="file-list">
+          <div class="file-list-header">
+            <h2>最近文件</h2>
+            <button class="btn btn-secondary">查看全部</button>
+          </div>
+          
+          <div class="file-item">
+            <span class="material-icons file-icon">folder_zip</span>
+            <div class="file-info">
+              <div class="file-name">项目文档.zip</div>
+              <div class="file-meta">
+                <span>2.5 MB</span> • 
+                <span>压缩率 75%</span> • 
+                <span>2分钟前</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary">
+              <span class="material-icons">more_vert</span>
+            </button>
+          </div>
+          
+          <div class="file-item">
+            <span class="material-icons file-icon">folder_zip</span>
+            <div class="file-info">
+              <div class="file-name">照片备份.rar</div>
+              <div class="progress-bar">
+                <div class="progress-fill"></div>
+              </div>
+              <div class="file-meta">
+                <span>1.8 GB</span> • 
+                <span>压缩中 60%</span> • 
+                <span>剩余 2 分钟</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary">
+              <span class="material-icons">pause</span>
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- 压缩页面 -->
+    <div class="screen">
+      <aside class="sidebar">
+        <!-- 相同的侧边栏 -->
+      </aside>
+
+      <main class="main-content">
+        <h1 class="page-title">压缩文件</h1>
+        
+        <div class="upload-area">
+          <span class="material-icons" style="font-size: 48px; color: var(--primary); margin-bottom: var(--space-md);">cloud_upload</span>
+          <h3 style="margin-bottom: var(--space-sm);">拖放文件到这里</h3>
+          <p style="color: var(--text-secondary);">或点击选择文件</p>
+        </div>
+        
+        <div class="settings-section">
+          <h3 style="margin-bottom: var(--space-lg);">压缩选项</h3>
+          
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="material-icons setting-icon">format_list_bulleted</span>
+              <div>
+                <div>压缩格式</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">选择输出的压缩文件格式</div>
+              </div>
+            </div>
+            <select class="btn btn-secondary">
+              <option>ZIP 格式</option>
+              <option>RAR 格式</option>
+              <option>7Z 格式</option>
+            </select>
+          </div>
+          
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="material-icons setting-icon">speed</span>
+              <div>
+                <div>压缩等级</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">选择压缩率和速度的平衡</div>
+              </div>
+            </div>
+            <select class="btn btn-secondary">
+              <option>标准压缩</option>
+              <option>极速压缩</option>
+              <option>最大压缩</option>
+            </select>
+          </div>
+          
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="material-icons setting-icon">lock</span>
+              <div>
+                <div>加密选项</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">为压缩文件添加密码保护</div>
+              </div>
+            </div>
+            <input type="password" placeholder="输入密码" class="btn btn-secondary">
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" style="width: 100%;">
+          <span class="material-icons" style="margin-right: var(--space-sm);">folder_zip</span>
+          开始压缩
+        </button>
+      </main>
+    </div>
+
+    <!-- 工具箱页面 -->
+    <div class="screen">
+      <aside class="sidebar">
+        <!-- 相同的侧边栏 -->
+      </aside>
+
+      <main class="main-content">
+        <h1 class="page-title">工具箱</h1>
+        
+        <div class="tools-grid">
+          <div class="tool-card">
+            <span class="material-icons tool-icon">build</span>
+            <h3 style="margin-bottom: var(--space-sm);">修复压缩文件</h3>
+            <p style="color: var(--text-secondary);">修复损坏的ZIP、RAR文件</p>
+          </div>
+          
+          <div class="tool-card">
+            <span class="material-icons tool-icon">content_cut</span>
+            <h3 style="margin-bottom: var(--space-sm);">分卷压缩</h3>
+            <p style="color: var(--text-secondary);">将大文件分割成多个小文件</p>
+          </div>
+          
+          <div class="tool-card">
+            <span class="material-icons tool-icon">security</span>
+            <h3 style="margin-bottom: var(--space-sm);">加密工具</h3>
+            <p style="color: var(--text-secondary);">为压缩文件添加密码保护</p>
+          </div>
+          
+          <div class="tool-card">
+            <span class="material-icons tool-icon">compare</span>
+            <h3 style="margin-bottom: var(--space-sm);">文件对比</h3>
+            <p style="color: var(--text-secondary);">比较两个压缩文件的差异</p>
+          </div>
+          
+          <div class="tool-card">
+            <span class="material-icons tool-icon">speed</span>
+            <h3 style="margin-bottom: var(--space-sm);">压缩测试</h3>
+            <p style="color: var(--text-secondary);">测试压缩文件的完整性</p>
+          </div>
+          
+          <div class="tool-card">
+            <span class="material-icons tool-icon">format_list_bulleted</span>
+            <h3 style="margin-bottom: var(--space-sm);">批量处理</h3>
+            <p style="color: var(--text-secondary);">批量压缩或解压文件</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- 设置页面 -->
+    <div class="screen">
+      <aside class="sidebar">
+        <!-- 相同的侧边栏 -->
+      </aside>
+
+      <main class="main-content">
+        <h1 class="page-title">设置</h1>
+        
+        <div class="settings-section">
+          <h3 style="margin-bottom: var(--space-lg);">常规设置</h3>
+          
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="material-icons setting-icon">language</span>
+              <div>
+                <div>界面语言</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">选择软件界面显示语言</div>
+              </div>
+            </div>
+            <select class="btn btn-secondary">
+              <option>简体中文</option>
+              <option>English</option>
+              <option>日本語</option>
+            </select>
+          </div>
+          
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="material-icons setting-icon">folder</span>
+              <div>
+                <div>默认输出目录</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">设置压缩文件的默认保存位置</div>
+              </div>
+            </div>
+            <button class="btn btn-secondary">选择目录</button>
+          </div>
+        </div>
+        
+        <div class="settings-section">
+          <h3 style="margin-bottom: var(--space-lg);">压缩设置</h3>
+          
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="material-icons setting-icon">folder_zip</span>
+              <div>
+                <div>默认压缩格式</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">新建压缩文件时使用的格式</div>
+              </div>
+            </div>
+            <select class="btn btn-secondary">
+              <option>ZIP 格式</option>
+              <option>RAR 格式</option>
+              <option>7Z 格式</option>
+            </select>
+          </div>
+          
+          <div class="setting-item">
+            <div class="setting-label">
+              <span class="material-icons setting-icon">speed</span>
+              <div>
+                <div>默认压缩等级</div>
+                <div style="color: var(--text-secondary); font-size: 12px;">压缩文件时使用的压缩等级</div>
+              </div>
+            </div>
+            <select class="btn btn-secondary">
+              <option>标准压缩</option>
+              <option>极速压缩</option>
+              <option>最大压缩</option>
+            </select>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
